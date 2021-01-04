@@ -55,8 +55,8 @@ private:
     struct cmpA {
         using is_transparent = void;
         bool operator() (const point_type &p1, const point_type &p2) const {
-            if (p1.arg() == p2.arg())
-                return p1.value() > p2.value();
+            if (!(p1.arg() < p2.arg()) and !(p2.arg() < p1.arg()))
+                return p2.value() < p1.value();
             else
                 return p1.arg() < p2.arg();
         }
@@ -70,10 +70,10 @@ private:
 
     struct cmpV {
         bool operator() (const point_type &p1, const point_type &p2) const {
-            if (p1.value() == p2.value())
+            if (!(p1.value() < p2.value()) and !(p2.value() < p1.value()))
                 return p1.arg() < p2.arg();
             else
-                return p1.value() > p2.value();
+                return p2.value() < p1.value();
         }
     };
 
@@ -111,7 +111,7 @@ bool FunctionMaxima<A, V>::is_maximum(const FunctionMaxima::iterator &point_it, 
             else
                 --previous;
         }
-        if (!cond1 and point_it->value() >= previous->value()) // porównanie V może wyrzucić wyjątek (z silną gwarancją)
+        if (!cond1 and !(point_it->value() < previous->value())) // porównanie V może wyrzucić wyjątek (z silną gwarancją)
             cond1 = true;
     }
 
@@ -127,7 +127,7 @@ bool FunctionMaxima<A, V>::is_maximum(const FunctionMaxima::iterator &point_it, 
                 else
                     ++next;
             }
-            if (!cond2 and point_it->value() >= next->value()) // porównanie V może wyrzucić wyjątek (z silną gwarancją)
+            if (!cond2 and !(point_it->value() < next->value())) // porównanie V może wyrzucić wyjątek (z silną gwarancją)
                 cond2 = true;
         }
     }
@@ -146,7 +146,7 @@ void FunctionMaxima<A, V>::set_value(const A &a, const V &v) { // zapewnia siln�
     iterator point_it = points.find(a); // może wyrzucić wyjątek, ale nic nie uległo zmianie wiec dalej silna gwarancja
 
     if (point_it != points.end()) {
-        if (point_it->value() == v)
+        if (!(point_it->value() < v) and !(v < point_it->value()))
             return; // zmieniamy wartość na identyczną, operacja nic nie zmieni więc nie ma po co jej wykonywać
 
         point_to_erase = point_it;
