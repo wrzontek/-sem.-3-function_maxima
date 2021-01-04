@@ -64,16 +64,19 @@ int main() {
     assert(fun_equal(fun, {{0, 0}, {1, 0}, {2, 0}}));
 
     assert(fun_mx_equal(fun, {{0, 0}, {1, 0}, {2, 0}}));
-/*
+
     fun.set_value(1, 1);
-    //assert(fun_mx_equal(fun, {{1, 1}}));
 
-    fun.set_value(2, 2);
+    assert(fun_equal(fun, {{0, 0}, {1, 1}, {2, 0}}));
+
+    assert(fun_mx_equal(fun, {{1, 1}}));
+
+    //fun.set_value(2, 2);
     //assert(fun_mx_equal(fun, {{2, 2}}));
-    fun.set_value(0, 2);
-    fun.set_value(1, 3);
+    //fun.set_value(0, 2);
+    //fun.set_value(1, 3);
     //assert(fun_mx_equal(fun, {{1, 3}}));
-
+/*
     try {
         std::cout << fun.value_at(4) << std::endl;
         assert(false);
