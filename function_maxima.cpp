@@ -50,21 +50,21 @@ int main() {
 
     assert(fun_equal(fun, {{0, 1}}));
 
-    //assert(fun_mx_equal(fun, {{0, 1}}));
+    assert(fun_mx_equal(fun, {{0, 1}}));
 
     fun.set_value(0, 0);
+
     assert(fun_equal(fun, {{0, 0}}));
 
-
-
-    //assert(fun_mx_equal(fun, {{0, 0}}));
+    assert(fun_mx_equal(fun, {{0, 0}}));
 
     fun.set_value(1, 0);
     fun.set_value(2, 0);
+
     assert(fun_equal(fun, {{0, 0}, {1, 0}, {2, 0}}));
 
-    //assert(fun_mx_equal(fun, {{0, 0}, {1, 0}, {2, 0}}));
-
+    assert(fun_mx_equal(fun, {{0, 0}, {1, 0}, {2, 0}}));
+/*
     fun.set_value(1, 1);
     //assert(fun_mx_equal(fun, {{1, 1}}));
 
@@ -118,6 +118,6 @@ int main() {
     //    }
     }
    // assert(counter == 2 * N - 1);
-   // big = fun;
+   // big = fun;*/
     return 123;
 }
