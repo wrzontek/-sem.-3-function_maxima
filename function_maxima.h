@@ -3,37 +3,53 @@
 #include <set>
 #include <memory>
 #include <stdexcept>
-#include <vector>
-#include <iostream>
 
 template<typename A, typename V>
 class FunctionMaxima {
 public:
     FunctionMaxima() = default;
-    FunctionMaxima(const FunctionMaxima<A, V> &other);
-    FunctionMaxima& operator=(const FunctionMaxima<A, V> &other);
+    FunctionMaxima(const FunctionMaxima<A, V> &other){
+        this->points = other.points;
+        this->maxima = other.maxima;
+    }
+
+    void swap(FunctionMaxima<A, V> &other) {
+        this->points.swap(other.points);
+        this->maxima.swap(other.maxima);
+    }
+
+    FunctionMaxima& operator=(const FunctionMaxima<A, V> &other){
+        FunctionMaxima<A, V> temp(other);
+        temp.swap(*this);
+        return *this;
+    }
+
+//    FunctionMaxima& operator=(FunctionMaxima<A, V> other){ //tworzy kopie kiedy wywołujemy fun
+//        other.swap(*this);
+//        return *this;
+//    }
 
     V const &value_at(A const &a) const;
     void set_value(A const &a, V const &v);
     void erase(A const &a);
 
     class point_type {
+        friend class FunctionMaxima;
     public:
         A const& arg() const { return *a_ptr.get(); }
         V const& value() const { return *v_ptr.get(); }
 
         point_type(const point_type &other): a_ptr(other.a_ptr), v_ptr(other.v_ptr) {}
-        // ^ \/ TODO tych nie jestem pewnien
+
         point_type& operator=(const point_type &other) {
             this->a_ptr = other.a_ptr;
             this->v_ptr = other.v_ptr;
         }
-
-        point_type(const A &a, const V &v) { // TODO to chyba nie powinno być publiczne ale nie wiem jak to zrobić inaczej
+    private:
+        point_type(const A &a, const V &v) {
             a_ptr = std::make_shared<A> (a);
             v_ptr = std::make_shared<V> (v);
         }
-    private:
         std::shared_ptr<A> a_ptr;
         std::shared_ptr<V> v_ptr;
     };
@@ -41,19 +57,20 @@ public:
     using iterator =  typename std::set<point_type>::iterator;
     using mx_iterator =  typename std::set<point_type>::iterator;
 
-    iterator begin() const { return points.begin(); }
-    iterator end() const { return points.end(); }
+    iterator begin() const noexcept { return points.begin(); }
+    iterator end() const noexcept { return points.end(); }
     iterator find(A const &a) const { return points.find(a); }
 
-    mx_iterator mx_begin() const { return maxima.begin(); }
-    mx_iterator mx_end() const { return maxima.end(); }
+    mx_iterator mx_begin() const noexcept { return maxima.begin(); }
+    mx_iterator mx_end() const noexcept { return maxima.end(); }
 
     using size_type = size_t;
-    [[nodiscard]] size_type size() const { return points.size(); }
+    [[nodiscard]] size_type size() const noexcept { return points.size(); }
 
 private:
     struct cmpA {
-        using is_transparent = void;
+        using is_transparent = void; // pozwala na porównywanie A z point_type
+
         bool operator() (const point_type &p1, const point_type &p2) const {
             if (!(p1.arg() < p2.arg()) and !(p2.arg() < p1.arg()))
                 return p2.value() < p1.value();
@@ -61,7 +78,7 @@ private:
                 return p1.arg() < p2.arg();
         }
         bool operator() (const A &a, const point_type &p2) const {
-            return a < p2.arg(); //todo tu chyba nie trzeba try catch bo set to i tak throwuje nie?
+            return a < p2.arg();
         }
         bool operator() (const point_type &p2, const A &a) const {
             return p2.arg() < a;
@@ -77,7 +94,7 @@ private:
         }
     };
 
-    bool is_maximum(const iterator &point_it, const iterator &erased);
+    bool is_maximum(const iterator &point_it, const iterator &erased) const;
 
     std::set<point_type, cmpA> points; // ten po A rosnąco (jak A równe to po V malejąco)
     std::set<point_type, cmpV> maxima; // ten po V malejąco (jak V równe to po A rosnąco)
@@ -97,7 +114,7 @@ V const& FunctionMaxima<A, V>::value_at(const A &a) const { // zapewnia silną g
 }
 
 template<typename A, typename V>
-bool FunctionMaxima<A, V>::is_maximum(const FunctionMaxima::iterator &point_it, const FunctionMaxima::iterator &erased) {
+bool FunctionMaxima<A, V>::is_maximum(const FunctionMaxima::iterator &point_it, const FunctionMaxima::iterator &erased) const {
     // zapewnia silną gwarancję (nic tak naprawdę nie zmienia, tylko sprawdza warunki i zwraca boola)
     bool cond1 = false, cond2 = false;
     if (point_it == points.begin()) {
@@ -133,7 +150,6 @@ bool FunctionMaxima<A, V>::is_maximum(const FunctionMaxima::iterator &point_it, 
     }
 
     return (cond1 and cond2);
-
 }
 
 template<typename A, typename V>
@@ -309,8 +325,5 @@ void FunctionMaxima<A, V>::erase(const A &a) { // zapewnia silną gwarancję
         if (it != maxima.end())
             maxima.erase(it); //nothrow
 }
-
-
-
 
 #endif //FUNCTION_MAXIMA_H

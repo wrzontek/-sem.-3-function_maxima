@@ -92,6 +92,8 @@ int main() {
     fun.set_value(-1, -1);
     assert(fun_mx_equal(fun, {{0, 2}, {2, 2}, {-2, 0}}));
 
+    //FunctionMaxima<int, int>::point_type p(1,2); //to nie działa i OK, bo nie musi
+
     std::vector<FunctionMaxima<Secret, Secret>::point_type> v;
     {
         FunctionMaxima<Secret, Secret> temp;
@@ -121,6 +123,10 @@ int main() {
         }
     }
     assert(counter == 2 * N - 1);
-   // big = fun;
+    big = fun;
+    assert(fun_mx_equal(big, {{0, 2}, {2, 2}, {-2, 0}}));
     return 123;
 }
+
+
+
