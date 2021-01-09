@@ -13,7 +13,7 @@ public:
         this->maxima = other.maxima;
     }
 
-    void swap(FunctionMaxima<A, V> &other) {
+    void swap(FunctionMaxima<A, V> &other) noexcept {
         this->points.swap(other.points);
         this->maxima.swap(other.maxima);
     }
@@ -23,11 +23,6 @@ public:
         temp.swap(*this);
         return *this;
     }
-
-//    FunctionMaxima& operator=(FunctionMaxima<A, V> other){ //tworzy kopie kiedy wywołujemy fun
-//        other.swap(*this);
-//        return *this;
-//    }
 
     V const &value_at(A const &a) const;
     void set_value(A const &a, V const &v);
